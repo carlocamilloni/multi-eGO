@@ -941,9 +941,9 @@ def generate_basic_LJ(meGO_ensemble):
     basic_LJ["learned"] = 0
     basic_LJ["1-4"] = "1>4"
     # Sorting the pairs prioritising intermolecular interactions
-    basic_LJ.sort_values(by=["ai", "aj", "same_chain"], ascending=[True, True, True], inplace=True)
+    #basic_LJ.sort_values(by=["ai", "aj", "same_chain"], ascending=[True, True, True], inplace=True)
     # Cleaning the duplicates
-    basic_LJ = basic_LJ.drop_duplicates(subset=["ai", "aj"], keep="first")
+    #basic_LJ = basic_LJ.drop_duplicates(subset=["ai", "aj"], keep="first")
 
     return basic_LJ
 
@@ -1495,6 +1495,27 @@ def generate_LJ(meGO_ensemble, train_dataset, check_dataset, parameters):
     """
     )
 
+    # Alternative rule for basic LJ: these always superseed learned ones
+    # Now is time to add masked default interactions for pairs
+    # that have not been learned in any other way
+    basic_LJ = generate_basic_LJ(meGO_ensemble)
+    basic_LJ = basic_LJ[needed_fields]
+    meGO_LJ = pd.concat([meGO_LJ, basic_LJ])
+
+    # make meGO_LJ fully symmetric
+    # Create inverse DataFrame
+    inverse_meGO_LJ = meGO_LJ.rename(
+        columns={"ai": "aj", "aj": "ai", "molecule_name_ai": "molecule_name_aj", "molecule_name_aj": "molecule_name_ai"}
+    ).copy()
+    # Concatenate original and inverse DataFrames
+    # Here we have a fully symmetric matrix for both intra/intersame/intercross
+    meGO_LJ = pd.concat([meGO_LJ, inverse_meGO_LJ], axis=0, sort=False, ignore_index=True)
+
+    # Sorting the pairs prioritising basic interactions
+    meGO_LJ.sort_values(by=["ai", "aj", "same_chain", "learned"], ascending=[True, True, True, True], inplace=True)
+    # Cleaning the duplicates, that is that we retained not learned interactions
+    meGO_LJ = meGO_LJ.drop_duplicates(subset=["ai", "aj", "same_chain"], keep="first")
+
     # Here we create a copy of contacts to be added in pairs-exclusion section in topol.top.
     meGO_LJ_14 = meGO_LJ.copy()
 
@@ -1562,25 +1583,25 @@ def generate_LJ(meGO_ensemble, train_dataset, check_dataset, parameters):
 
     # Now is time to add masked default interactions for pairs
     # that have not been learned in any other way
-    basic_LJ = generate_basic_LJ(meGO_ensemble)
-    basic_LJ = basic_LJ[needed_fields]
-    meGO_LJ = pd.concat([meGO_LJ, basic_LJ])
+    #basic_LJ = generate_basic_LJ(meGO_ensemble)
+    #basic_LJ = basic_LJ[needed_fields]
+    #meGO_LJ = pd.concat([meGO_LJ, basic_LJ])
 
     # make meGO_LJ fully symmetric
     # Create inverse DataFrame
-    inverse_meGO_LJ = meGO_LJ.rename(
-        columns={"ai": "aj", "aj": "ai", "molecule_name_ai": "molecule_name_aj", "molecule_name_aj": "molecule_name_ai"}
-    ).copy()
+    #inverse_meGO_LJ = meGO_LJ.rename(
+    #    columns={"ai": "aj", "aj": "ai", "molecule_name_ai": "molecule_name_aj", "molecule_name_aj": "molecule_name_ai"}
+    #).copy()
     # Concatenate original and inverse DataFrames
     # Here we have a fully symmetric matrix for both intra/intersame/intercross
-    meGO_LJ = pd.concat([meGO_LJ, inverse_meGO_LJ], axis=0, sort=False, ignore_index=True)
+    #meGO_LJ = pd.concat([meGO_LJ, inverse_meGO_LJ], axis=0, sort=False, ignore_index=True)
 
     # Sorting the pairs prioritising learned interactions
-    meGO_LJ.sort_values(by=["ai", "aj", "same_chain", "learned"], ascending=[True, True, True, False], inplace=True)
+    #meGO_LJ.sort_values(by=["ai", "aj", "same_chain", "learned"], ascending=[True, True, True, False], inplace=True)
     # Cleaning the duplicates, that is that we retained a not learned interaction only if it is unique
     # first we remove duplicated masked interactions
-    meGO_LJ = meGO_LJ.drop_duplicates(subset=["ai", "aj", "same_chain", "learned"], keep="first")
-    meGO_LJ = meGO_LJ.loc[(~(meGO_LJ.duplicated(subset=["ai", "aj"], keep=False)) | (meGO_LJ["learned"] == 1))]
+    #meGO_LJ = meGO_LJ.drop_duplicates(subset=["ai", "aj", "same_chain", "learned"], keep="first")
+    #meGO_LJ = meGO_LJ.loc[(~(meGO_LJ.duplicated(subset=["ai", "aj"], keep=False)) | (meGO_LJ["learned"] == 1))]
 
     # we are ready to finalize the setup
     meGO_LJ["c6"] = 4 * meGO_LJ["epsilon"] * (meGO_LJ["sigma"] ** 6)
