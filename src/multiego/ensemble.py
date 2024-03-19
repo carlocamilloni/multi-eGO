@@ -733,7 +733,13 @@ def init_LJ_datasets(meGO_ensemble, pairs14, exclusion_bonds14):
             * train_dataset["aj"].map(meGO_ensemble["sbtype_c12_dict"])
         ),
     )
+    masked_c12 = np.where(
+        oxygen_mask,
+        True,
+        False,
+    )
     train_dataset["rep"] = train_dataset["rep"].fillna(pd.Series(pairwise_c12))
+    train_dataset["masked"] = pd.Series(masked_c12)
     # This is a debug check to avoid data inconsistencies
     if (np.abs(train_dataset["rc_cutoff"] - train_dataset["cutoff"])).max() > 0:
         print(
@@ -802,7 +808,13 @@ def init_LJ_datasets(meGO_ensemble, pairs14, exclusion_bonds14):
                 * check_dataset["aj"].map(meGO_ensemble["sbtype_c12_dict"])
             ),
         )
+        masked_c12 = np.where(
+            oxygen_mask,
+            True,
+            False,
+        )
         check_dataset["rep"] = check_dataset["rep"].fillna(pd.Series(pairwise_c12))
+        check_dataset["masked"] = pd.Series(masked_c12)
         # This is a debug check to avoid data inconsistencies
         if (np.abs(check_dataset["rc_cutoff"] - check_dataset["cutoff"])).max() > 0:
             print(
@@ -979,7 +991,14 @@ def set_epsilon(meGO_LJ, parameters):
     ] = -(parameters.inter_epsilon / np.log(meGO_LJ["rc_threshold"])) * (
         np.log(meGO_LJ["probability"] / np.maximum(meGO_LJ["rc_probability"], meGO_LJ["rc_threshold"]))
     )
-
+    # special case for potentially attractive masked
+    meGO_LJ.loc[
+        (meGO_LJ["probability"] > meGO_LJ["limit_rc"] * np.maximum(meGO_LJ["rc_probability"], meGO_LJ["rc_threshold"]))
+        & (meGO_LJ["masked"]),
+        "epsilon",
+    ] = (
+        -meGO_LJ["rep"] * (meGO_LJ["distance"] / meGO_LJ["rc_distance"]) ** 12
+    )
     # General repulsive term
     # These are with negative sign to store them as epsilon values
     # Intramolecular
@@ -1024,6 +1043,8 @@ def set_epsilon(meGO_LJ, parameters):
     ] = (
         -meGO_LJ["rep"] * (meGO_LJ["distance"] / meGO_LJ["rc_distance"]) ** 12
     )
+    # special case masked interactions outside the above cases
+    meGO_LJ.loc[(meGO_LJ["epsilon"] == np.nan) & (meGO_LJ["masked"]), "epsilon"] = -meGO_LJ["rep"]
 
     # clean NaN and zeros
     meGO_LJ.dropna(subset=["epsilon"], inplace=True)
@@ -1380,14 +1401,15 @@ def generate_LJ(meGO_ensemble, train_dataset, check_dataset, parameters):
     meGO_LJ_14 : pd.DataFrame
         Contains 1-4 atomic contacts associated with LJ parameters and statistics.
     """
-    # This keep only significant attractive/repulsive interactions
+    # This keep only significant attractive/repulsive interactions as well as masked interactions
     meGO_LJ = train_dataset.loc[
         (train_dataset["probability"] > train_dataset["md_threshold"])
         | (
             (train_dataset["probability"] <= train_dataset["md_threshold"])
             & (train_dataset["probability"] > 0.0)
             & (train_dataset["probability"] < np.maximum(train_dataset["rc_probability"], train_dataset["rc_threshold"]))
-        )
+        ) |
+        (train_dataset["masked"])
     ].copy()
     # remove intramolecular excluded interactions
     meGO_LJ = meGO_LJ.loc[(meGO_LJ["1-4"] != "1_2_3") & (meGO_LJ["1-4"] != "0")]
@@ -1445,6 +1467,7 @@ def generate_LJ(meGO_ensemble, train_dataset, check_dataset, parameters):
         "distance",
         "cutoff",
         "rep",
+        "masked",
         "md_threshold",
         "rc_threshold",
         "learned",
@@ -1494,22 +1517,6 @@ def generate_LJ(meGO_ensemble, train_dataset, check_dataset, parameters):
     - Suggested cut-off value: {2.5*meGO_LJ['sigma'].max():{4}.{3}} nm
     """
     )
-
-    # Alternative rule for basic LJ: these always superseed learned ones
-    # Now is time to add masked default interactions for pairs
-    # that have not been learned in any other way
-    basic_LJ = generate_basic_LJ(meGO_ensemble)
-    basic_LJ = basic_LJ[needed_fields]
-    meGO_LJ = pd.concat([meGO_LJ, basic_LJ])
-
-    # make meGO_LJ fully symmetric
-    # Create inverse DataFrame
-    inverse_meGO_LJ = meGO_LJ.rename(
-        columns={"ai": "aj", "aj": "ai", "molecule_name_ai": "molecule_name_aj", "molecule_name_aj": "molecule_name_ai"}
-    ).copy()
-    # Concatenate original and inverse DataFrames
-    # Here we have a fully symmetric matrix for both intra/intersame/intercross
-    meGO_LJ = pd.concat([meGO_LJ, inverse_meGO_LJ], axis=0, sort=False, ignore_index=True)
 
     # Sorting the pairs prioritising basic interactions
     meGO_LJ.sort_values(by=["ai", "aj", "same_chain", "learned"], ascending=[True, True, True, True], inplace=True)
@@ -1581,27 +1588,21 @@ def generate_LJ(meGO_ensemble, train_dataset, check_dataset, parameters):
         # remove them from the default force-field
         meGO_LJ = meGO_LJ.loc[(~meGO_LJ["same_chain"])]
 
-    # Now is time to add masked default interactions for pairs
-    # that have not been learned in any other way
-    #basic_LJ = generate_basic_LJ(meGO_ensemble)
-    #basic_LJ = basic_LJ[needed_fields]
-    #meGO_LJ = pd.concat([meGO_LJ, basic_LJ])
-
     # make meGO_LJ fully symmetric
     # Create inverse DataFrame
-    #inverse_meGO_LJ = meGO_LJ.rename(
-    #    columns={"ai": "aj", "aj": "ai", "molecule_name_ai": "molecule_name_aj", "molecule_name_aj": "molecule_name_ai"}
-    #).copy()
+    inverse_meGO_LJ = meGO_LJ.rename(
+        columns={"ai": "aj", "aj": "ai", "molecule_name_ai": "molecule_name_aj", "molecule_name_aj": "molecule_name_ai"}
+    ).copy()
     # Concatenate original and inverse DataFrames
     # Here we have a fully symmetric matrix for both intra/intersame/intercross
-    #meGO_LJ = pd.concat([meGO_LJ, inverse_meGO_LJ], axis=0, sort=False, ignore_index=True)
+    meGO_LJ = pd.concat([meGO_LJ, inverse_meGO_LJ], axis=0, sort=False, ignore_index=True)
 
     # Sorting the pairs prioritising learned interactions
-    #meGO_LJ.sort_values(by=["ai", "aj", "same_chain", "learned"], ascending=[True, True, True, False], inplace=True)
+    meGO_LJ.sort_values(by=["ai", "aj", "same_chain", "learned"], ascending=[True, True, True, False], inplace=True)
     # Cleaning the duplicates, that is that we retained a not learned interaction only if it is unique
     # first we remove duplicated masked interactions
-    #meGO_LJ = meGO_LJ.drop_duplicates(subset=["ai", "aj", "same_chain", "learned"], keep="first")
-    #meGO_LJ = meGO_LJ.loc[(~(meGO_LJ.duplicated(subset=["ai", "aj"], keep=False)) | (meGO_LJ["learned"] == 1))]
+    meGO_LJ = meGO_LJ.drop_duplicates(subset=["ai", "aj", "same_chain", "learned"], keep="first")
+    meGO_LJ = meGO_LJ.loc[(~(meGO_LJ.duplicated(subset=["ai", "aj"], keep=False)) | (meGO_LJ["learned"] == 1))]
 
     # we are ready to finalize the setup
     meGO_LJ["c6"] = 4 * meGO_LJ["epsilon"] * (meGO_LJ["sigma"] ** 6)
