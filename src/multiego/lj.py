@@ -91,22 +91,76 @@ def set_sig_epsilon(meGO_LJ, parameters):
     # Precompute shared sub-expression (used in both attractive and repulsive conditions)
     eps_prior_pos = np.maximum(0.0, meGO_LJ["epsilon_prior"])
 
-    # Attractive interactions
-    # These are defined only if the training probability is greater than MD_threshold and
-    # by comparing them with RC_probabilities so that the resulting epsilon is between eps_min and eps_0
+    # attractive interactions:
+    # these are attractive in the prior MG model with attractive-like probabilities
     condition = (
-        meGO_LJ["probability"]
-        > meGO_LJ["limit_rc_att"] * np.maximum(meGO_LJ["rc_probability"], meGO_LJ["rc_threshold"])
-    ) & (meGO_LJ["probability"] > meGO_LJ["md_threshold"])
+        (
+            meGO_LJ["probability"]
+            > meGO_LJ["limit_rc_att"] * np.maximum(meGO_LJ["rc_probability"], meGO_LJ["rc_threshold"])
+        )
+        & (meGO_LJ["probability"] > meGO_LJ["md_threshold"])
+        & (meGO_LJ["mg_epsilon"] > 0.0)
+    )  # & ((meGO_LJ["bond_distance"]>5) | (~meGO_LJ["same_chain"]))
     with np.errstate(divide="ignore"):
         meGO_LJ.loc[condition, "epsilon"] = eps_prior_pos - (
             (meGO_LJ["epsilon_0"] - eps_prior_pos) / np.log(meGO_LJ["rc_threshold"])
         ) * (np.log(meGO_LJ["probability"] / (np.maximum(meGO_LJ["rc_probability"], meGO_LJ["rc_threshold"]))))
     meGO_LJ.loc[condition, "learned"] = 1
-    meGO_LJ.loc[condition, "sigma"] = meGO_LJ["distance"] / 2.0 ** (1.0 / 6.0)
+    meGO_LJ.loc[condition, "sigma"] = meGO_LJ["distance"] / 2.0 ** (
+        1.0 / 6.0
+    )  # .clip(lower=0.8 * meGO_LJ["mg_sigma"], upper=1.2 * meGO_LJ["mg_sigma"])[condition]
 
-    # Repulsive interactions (probability above MD threshold but below attractive threshold)
-    # this is used only when MD_th < MD_p < limit_rc_att*RC_p
+    # these are attractive in the prior MG model with repulsive-like probabilities and do not belong to the five-bonds rule region (where in this
+    # case they should stay repulsive)
+    condition = (
+        (
+            meGO_LJ["probability"]
+            <= meGO_LJ["limit_rc_att"] * np.maximum(meGO_LJ["rc_probability"], meGO_LJ["rc_threshold"])
+        )
+        & (meGO_LJ["probability"] > meGO_LJ["md_threshold"])
+        & (meGO_LJ["mg_epsilon"] > 0.0)
+        & ((meGO_LJ["bond_distance"] > 5) | (~meGO_LJ["same_chain"]))
+    )
+    with np.errstate(divide="ignore"):
+        meGO_LJ.loc[condition, "epsilon"] = 0.07
+    meGO_LJ.loc[condition, "learned"] = 1
+    meGO_LJ.loc[condition, "sigma"] = meGO_LJ["distance"] / 2.0 ** (
+        1.0 / 6.0
+    )  # .clip(lower=0.8 * meGO_LJ["mg_sigma"], upper=1.2 * meGO_LJ["mg_sigma"])[condition]
+
+    # repulsive interactions:
+    # these are repulsive in the prior MG model but with "attractive like probabililites"
+    condition = (
+        (
+            meGO_LJ["probability"]
+            > meGO_LJ["limit_rc_att"] * np.maximum(meGO_LJ["rc_probability"], meGO_LJ["rc_threshold"])
+        )
+        & (meGO_LJ["probability"] > meGO_LJ["md_threshold"])
+        & (meGO_LJ["rc_probability"] > meGO_LJ["md_threshold"])
+        & ((meGO_LJ["mg_epsilon"] < 0.0))  # | ((meGO_LJ["bond_distance"] <=5) & (meGO_LJ["same_chain"])))
+    )
+    meGO_LJ.loc[condition, "epsilon"] = (-meGO_LJ["rep"] * (meGO_LJ["distance"] / meGO_LJ["rc_distance"]) ** 12).clip(
+        lower=-2 * meGO_LJ["rep"], upper=-0.05 * meGO_LJ["rep"]
+    )[condition]
+    meGO_LJ.loc[condition, "learned"] = 1
+
+    condition = (
+        (
+            meGO_LJ["probability"]
+            > meGO_LJ["limit_rc_att"] * np.maximum(meGO_LJ["rc_probability"], meGO_LJ["rc_threshold"])
+        )
+        & (meGO_LJ["probability"] > meGO_LJ["md_threshold"])
+        & (meGO_LJ["rc_probability"] <= meGO_LJ["md_threshold"])
+        & ((meGO_LJ["mg_epsilon"] < 0.0))  # | ((meGO_LJ["bond_distance"] <=5) & (meGO_LJ["same_chain"])))
+    )
+    meGO_LJ.loc[condition, "epsilon"] = (-meGO_LJ["epsilon"] * (meGO_LJ["distance"]) ** 12).clip(
+        lower=-2 * meGO_LJ["rep"], upper=-0.05 * meGO_LJ["rep"]
+    )[condition]
+    meGO_LJ.loc[condition, "learned"] = 1
+
+    # repulsive interactions:
+    # these are repulsive in the prior MG model or attrative but in the 5 bonds rule region
+    # with "repulsive like probabililites"
     condition = (
         (
             meGO_LJ["probability"]
@@ -114,11 +168,25 @@ def set_sig_epsilon(meGO_LJ, parameters):
         )
         & (meGO_LJ["probability"] > meGO_LJ["md_threshold"])
         & (meGO_LJ["rc_probability"] > meGO_LJ["md_threshold"])
+        & ((meGO_LJ["mg_epsilon"] < 0.0) | ((meGO_LJ["bond_distance"] <= 5) & (meGO_LJ["same_chain"])))
     )
-    sub = meGO_LJ.loc[condition]
-    meGO_LJ.loc[condition, "epsilon"] = (-sub["rep"] * (sub["distance"] / sub["rc_distance"]) ** 12).clip(
-        lower=-2 * sub["rep"], upper=-0.05 * sub["rep"]
+    meGO_LJ.loc[condition, "epsilon"] = (-meGO_LJ["rep"] * (meGO_LJ["distance"] / meGO_LJ["rc_distance"]) ** 12).clip(
+        lower=-2 * meGO_LJ["rep"], upper=-0.05 * meGO_LJ["rep"]
     )
+    meGO_LJ.loc[condition, "learned"] = 1
+
+    condition = (
+        (
+            meGO_LJ["probability"]
+            <= meGO_LJ["limit_rc_att"] * np.maximum(meGO_LJ["rc_probability"], meGO_LJ["rc_threshold"])
+        )
+        & (meGO_LJ["probability"] > meGO_LJ["md_threshold"])
+        & (meGO_LJ["rc_probability"] <= meGO_LJ["md_threshold"])
+        & ((meGO_LJ["mg_epsilon"] < 0.0) | ((meGO_LJ["bond_distance"] <= 5) & (meGO_LJ["same_chain"])))
+    )
+    meGO_LJ.loc[condition, "epsilon"] = (-meGO_LJ["epsilon"] * (meGO_LJ["distance"]) ** 12).clip(
+        lower=-2 * meGO_LJ["rep"], upper=-0.05 * meGO_LJ["rep"]
+    )[condition]
     meGO_LJ.loc[condition, "learned"] = 1
 
     # for repulsive interactions reset sigma to its effective value for consistent merging
