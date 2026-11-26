@@ -45,6 +45,16 @@ The grids come from `src/multiego/data/coil_cmap_300K.npz`. This folder holds th
 
 - `build.py`: builds G-X(-Y)-G with PeptideBuilder and cuts the glycines to ACE/NME.
 - `coil_lib.py`: the NDRD reader and grid utilities.
-- The NDRD library file itself is not included. Download it from https://dunbrack.fccc.edu/lab/ndrd under its licence.
+- The NDRD library file (`NDRD_TCB.txt`, about 300 MB) is not included. Download it from https://dunbrack.fccc.edu/lab/ndrd.
 
 Coil target: D. Ting, G. Wang, M. Shapovalov, R. Mitra, M. I. Jordan, R. L. Dunbrack Jr., *Neighbor-dependent Ramachandran probability distributions of amino acids developed from a hierarchical Dirichlet process model*, PLoS Comput Biol 6:e1000763 (2010).
+
+## Licence and attribution
+
+The Neighbor-Dependent Ramachandran Distributions (NDRD) are distributed by the Dunbrack lab under the Creative Commons Attribution 4.0 licence (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/legalcode; NDRD licence text: https://dunbrack.fccc.edu/lab/product_ndrd/ndrd_license.txt).
+
+- **Adapted from NDRD:** `src/multiego/data/coil_cmap_300K.npz` and every `coil_cmap.itp` written by multi-eGO. The NDRD TCB densities were smoothed (σ 7.5°), floored, combined with the bare multi-eGO distributions into potentials at 300 K, clipped at ±6 kT and resampled on the 24×24 CMAP grid.
+- **Attribution:** any public use or redistribution must acknowledge the NDRD, by a link to https://dunbrack.fccc.edu/lab/ndrd or by citing Ting et al., PLoS Comput Biol 6:e1000763 (2010), and must state that the NDRD is distributed under CC BY 4.0. The header of each `coil_cmap.itp` carries this notice; keep it.
+- **Not derived from NDRD:** `data/bare_300K.npz` (bare multi-eGO distributions) and `src/multiego/data/backbone_terminal_cosines.json` (the force field's own cosines).
+- **Older notice:** the 2010 NDRD files used for the fit still carry an older restrictive notice in their header, which predates the current CC BY 4.0 licence.
+

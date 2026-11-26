@@ -97,7 +97,7 @@ def read_ndrd(path):
     Real NDRD files give 5x5 bin CENTRES at -180..175 (readme), i.e. bins straddle our cells -> each value is
     split over the 2x2 cells it overlaps (a 2.5 deg shift + 5 deg box, negligible vs the fit smoothing).
     The stand-in library (header 'STAND-IN') was written with bin FLOORS -> mapped directly.
-    Parsed grids are cached in <path>.cache.npz (licensed data: keep it with the original files)."""
+    Parsed grids are cached in <path>.cache.npz (NDRD data, CC BY 4.0)."""
     cache = path + ".cache.npz"
     if os.path.exists(cache) and os.path.getmtime(cache) > os.path.getmtime(path):
         z = np.load(cache)

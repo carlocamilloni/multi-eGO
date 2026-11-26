@@ -4,7 +4,7 @@ Coil CMAP backbone term.
 multi-ego-basic.ff no longer defines backbone phi/psi proper dihedrals: each protein residue X that has both
 backbone neighbours gets a neighbour-dependent CMAP V(phi, psi | L, X, R) from the transferable library in
 ``data/coil_cmap_300K.npz``. The library was fitted at 300 K against the NDRD TCB coil library (Ting et al.
-PLoS Comput Biol 6:e1000763, 2010), using bare multi-eGO MG references of ACE-X-NME and ACE-X-Y-NME peptides
+PLoS Comput Biol 6:e1000763, 2010; https://dunbrack.fccc.edu/lab/ndrd; CC BY 4.0), using bare multi-eGO MG references of ACE-X-NME and ACE-X-Y-NME peptides
 (see tools/coil_cmap). L or R is ``CAP`` when the neighbour is a cap (ACE, NME, NH2) or a residue without
 library data.
 
@@ -180,7 +180,10 @@ def write_cmap_itp(backbone_terms, path, header=""):
     lines = [
         header.rstrip(),
         "; coil CMAP (multiego/cmap.py): " + backbone_terms["meta"],
-        "; coil target: NDRD TCB library, Ting et al. PLoS Comput Biol 6:e1000763 (2010)",
+        "; coil target: Neighbor-Dependent Ramachandran Distributions (NDRD, TCB), https://dunbrack.fccc.edu/lab/ndrd",
+        "; Ting et al., PLoS Comput Biol 6:e1000763 (2010). NDRD is distributed under CC BY 4.0",
+        "; (https://creativecommons.org/licenses/by/4.0/). These CMAPs are adapted from it: NDRD densities smoothed and",
+        "; combined with bare multi-eGO distributions (see multi-eGO tools/coil_cmap). Keep this notice when sharing.",
         "",
         "[ cmaptypes ]",
         "",

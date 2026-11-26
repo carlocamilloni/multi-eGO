@@ -5,7 +5,8 @@ For a residue X with neighbours L and R (L or R = "CAP" for an ACE/NME-type cap)
 
     V(phi,psi | L,X,R) = -kT ln p_coil(L,X,R) + kT ln p_bare(L,X,R),     kT at T_fit (300 K)
 
-p_coil : NDRD TCB library (Ting et al. PLoS Comput Biol 6:e1000763, 2010), neighbour-dependent:
+p_coil : NDRD TCB library (Ting et al. PLoS Comput Biol 6:e1000763, 2010; https://dunbrack.fccc.edu/lab/ndrd;
+         CC BY 4.0), neighbour-dependent:
          ln p(X|L,R) = ln p(X|L) + ln p(X|R) - ln p(X|ALL), renormalised (a CAP side uses no term).
 p_bare : the bare multi-eGO MG force field (no backbone phi/psi terms) from capped-peptide runs, factorised
          the same way with the caps in the role of "ALL":
@@ -285,7 +286,9 @@ def main():
     s.add_argument("--partial", action="store_true", help="also use runs without the 'done' marker")
     s = sp.add_parser("fit")
     s.add_argument("--bare", required=True)
-    s.add_argument("--lib", required=True, help="NDRD_TCB.txt (licensed; not shipped)")
+    s.add_argument(
+        "--lib", required=True, help="NDRD_TCB.txt (https://dunbrack.fccc.edu/lab/ndrd, CC BY 4.0; not shipped: 300 MB)"
+    )
     s.add_argument("--out", required=True)
     s.add_argument("--temp", type=float, default=300.0)
     s.add_argument("--sigma", type=float, default=7.5, help="smoothing, deg")
