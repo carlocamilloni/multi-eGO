@@ -916,6 +916,9 @@
 ; Omega dihedral - PRO
 ;
 #define gd_zero   0.000  0.000 3
+; placeholder for the backbone phi/psi torsions: their potential is the coil CMAP written by multi-eGO
+; (src/multiego/cmap.py); zero strength, it only stops pdb2gmx from generating unparametrised torsions
+#define gd_cmap   0.000  0.000 1
 ; zero-strength placeholder: stops pdb2gmx auto-generating a torsion (Pro ring)
 
 ; Gaia's additional dihedral groups for Cholesterol

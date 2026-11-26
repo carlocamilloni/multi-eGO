@@ -298,6 +298,7 @@ class MeGOEnsemble:
     train_matrix_tuples: list = field(default_factory=list)
     meGO_bonded_interactions: dict = field(default_factory=dict)
     bond_pairs: dict = field(default_factory=dict)
+    backbone_terms: dict = field(default_factory=dict)
     user_pairs: dict = field(default_factory=dict)
 
     @classmethod
