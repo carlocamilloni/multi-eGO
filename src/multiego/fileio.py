@@ -410,6 +410,8 @@ def write_output_readme(meGO_LJ, parameters, output_dir, stat_str):
             f.write(f" - P_TH_SC_BKBN: {type_definitions.P_TH_SC_BKBN}\n")
             f.write(f" - EMAX_SC_BKBN: {type_definitions.EMAX_SC_BKBN}\n")
             f.write(f" - OM_SCALEDOWN: {type_definitions.OM_SCALEDOWN}\n")
+            f.write(f" - ATT_SIGMA: {type_definitions.ATT_SIGMA}\n")
+            f.write(f" - EMAX_HB: {type_definitions.EMAX_HB}\n")
 
 
 def save_matrix_png(output_path):

@@ -397,6 +397,11 @@ P_TH_SC_BKBN = 0.010
 P_TH_BKBN = 0.4/2
 # OM atomtype scaling factor. Probability is reduced by a factor to account for the protonation simmetry-breaking that can be found in protein cores 
 OM_SCALEDOWN = 1
+# sigma of attractive pairs: "exp_aver" (rmin = soft-min of the contact histogram, ~5th percentile)
+# or "rrep" (sigma = c12_rep^(1/12) from the repulsive table, rmin at the contact peak)
+ATT_SIGMA = "rrep"
+# separate energy scale of the attractive H-acceptor pairs (H with O, OA, OM, OS); None = part of their class
+EMAX_HB = None
 
 SHOW = False
 
@@ -407,7 +412,7 @@ PKL = "atdhisto.pkl"
 PKL_SB = "atdhisto.pkl"
 # R2_CORR_SB_= "scbk_correction_3res.csv" # Correction for sc-bkbn interactions # TODO merge the r2 in pkl file or viceversa
 # PKL_SB = None#"atdhisto_sb.pkl" 
-matrix = InteractionMatrix(pkl_file=PKL, emax = EMAX, c12_rep_df = _c12_df, pth=P_TH, pth_bkbn=P_TH_BKBN, show=SHOW, emax_bkbn=EMAX_BKBN, pth_sc_bkbn=P_TH_SC_BKBN, emax_sc_bkbn=EMAX_SC_BKBN, om_scaledown=OM_SCALEDOWN, pkl_file2=PKL_SB)#, r2_corr_sb=R2_CORR_SB_)
+matrix = InteractionMatrix(pkl_file=PKL, emax = EMAX, c12_rep_df = _c12_df, pth=P_TH, pth_bkbn=P_TH_BKBN, show=SHOW, emax_bkbn=EMAX_BKBN, pth_sc_bkbn=P_TH_SC_BKBN, emax_sc_bkbn=EMAX_SC_BKBN, om_scaledown=OM_SCALEDOWN, pkl_file2=PKL_SB, att_sigma=ATT_SIGMA, emax_hb=EMAX_HB)#, r2_corr_sb=R2_CORR_SB_)
 special_non_local = matrix.special_nonlocal_dict
 
 # Verify that every attractive special interaction carries an epsilon at least
