@@ -407,6 +407,10 @@ OM_SCALEDOWN = 1
 ATT_SIGMA = "rrep"
 # separate energy scale of the attractive H-acceptor pairs (H with O, OA, OM, OS); None = part of their class
 EMAX_HB = None
+# per atomtype-pair overrides: PAIR_RMIN {(atp1, atp2): rmin nm} for attractive pairs (instead of ATT_SIGMA),
+# PAIR_EPS {(atp1, atp2): epsilon} (positive = attractive) instead of the probability-derived energy
+PAIR_RMIN = {}
+PAIR_EPS = {}
 
 SHOW = False
 
@@ -417,7 +421,7 @@ PKL = "atdhisto.pkl"
 PKL_SB = "atdhisto.pkl"
 # R2_CORR_SB_= "scbk_correction_3res.csv" # Correction for sc-bkbn interactions # TODO merge the r2 in pkl file or viceversa
 # PKL_SB = None#"atdhisto_sb.pkl" 
-matrix = InteractionMatrix(pkl_file=PKL, emax = EMAX, c12_rep_df = _c12_df, pth=P_TH, pth_bkbn=P_TH_BKBN, show=SHOW, emax_bkbn=EMAX_BKBN, pth_sc_bkbn=P_TH_SC_BKBN, emax_sc_bkbn=EMAX_SC_BKBN, om_scaledown=OM_SCALEDOWN, pkl_file2=PKL_SB, att_sigma=ATT_SIGMA, emax_hb=EMAX_HB)#, r2_corr_sb=R2_CORR_SB_)
+matrix = InteractionMatrix(pkl_file=PKL, emax = EMAX, c12_rep_df = _c12_df, pth=P_TH, pth_bkbn=P_TH_BKBN, show=SHOW, emax_bkbn=EMAX_BKBN, pth_sc_bkbn=P_TH_SC_BKBN, emax_sc_bkbn=EMAX_SC_BKBN, om_scaledown=OM_SCALEDOWN, pkl_file2=PKL_SB, att_sigma=ATT_SIGMA, emax_hb=EMAX_HB, pair_rmin=PAIR_RMIN, pair_eps=PAIR_EPS)#, r2_corr_sb=R2_CORR_SB_)
 special_non_local = matrix.special_nonlocal_dict
 
 # Verify that every attractive special interaction carries an epsilon at least

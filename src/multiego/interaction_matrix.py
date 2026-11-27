@@ -28,7 +28,7 @@ class RemapUnpickler(pickle.Unpickler):
 
 class InteractionMatrix:
 
-    def __init__(self, pkl_file, emax=0.16, c12_rep_df=None, pth=None, show=False, pth_bkbn=None, emax_bkbn=None, pth_sc_bkbn=None, emax_sc_bkbn=None, om_scaledown=None, pkl_file2=None, r2_corr_sb=None, att_sigma="exp_aver", emax_hb=None):
+    def __init__(self, pkl_file, emax=0.16, c12_rep_df=None, pth=None, show=False, pth_bkbn=None, emax_bkbn=None, pth_sc_bkbn=None, emax_sc_bkbn=None, om_scaledown=None, pkl_file2=None, r2_corr_sb=None, att_sigma="exp_aver", emax_hb=None, pair_rmin=None, pair_eps=None):
         # att_sigma: how the LJ sigma of attractive pairs is set (rmin = 2^(1/6) sigma):
         #   "exp_aver" soft-min of the contact histogram (~5th percentile, the c12 average of make_mat)
         #   "rrep"     sigma = c12_rep^(1/12) from c12_rep_df, i.e. the attractive LJ shares sigma with the
@@ -41,6 +41,11 @@ class InteractionMatrix:
         # in their bkbn-bkbn / sc-bkbn class. The strongest H-bond pair of a class gets emax_hb, the others scale
         # linearly within [0.07, emax_hb] keeping their position in the class.
         self.emax_hb = emax_hb
+        # pair_rmin: {(atp1, atp2): rmin_nm} LJ minimum of attractive atomtype pairs, overriding att_sigma for those pairs
+        # pair_eps:  {(atp1, atp2): epsilon} energy of atomtype pairs, overriding the probability-derived value
+        #            (positive = attractive); applied after EMAX_HB
+        self.pair_rmin = {frozenset(k): v for k, v in (pair_rmin or {}).items()}
+        self.pair_eps = {frozenset(k): v for k, v in (pair_eps or {}).items()}
         self.atmat = self.build_matrix_dataframe(pkl_file, filename2=pkl_file2, r2_corr_sb=r2_corr_sb)
         self.emax = emax
         self.emax_bkbn = emax_bkbn if emax_bkbn is not None else emax
@@ -247,7 +252,9 @@ class InteractionMatrix:
         return float(row.values[0])
 
     def att_sigma_value(self, atp1, atp2):
-        """LJ sigma of an attractive atomtype pair, following self.att_sigma"""
+        """LJ sigma of an attractive atomtype pair, following self.att_sigma (and self.pair_rmin overrides)"""
+        if frozenset((atp1, atp2)) in self.pair_rmin:
+            return self.pair_rmin[frozenset((atp1, atp2))] / 2 ** (1 / 6)
         if self.att_sigma == "rrep":
             return self.c12_rep(atp1, atp2) ** (1 / 12)
         exp_aver = self.atmat.loc[self.atmat["atom_pair"] == f"{atp1}_{atp2}", "exp_aver"].values[0]
@@ -302,5 +309,13 @@ class InteractionMatrix:
             for cond, emax in ((condition_bkbn_bkbn, self.emax_bkbn), (condition_sc_bkbn, self.emax_sc_bkbn)):
                 m = hb & cond & (self.atmat["energy"] > 0)
                 self.atmat.loc[m, "energy"] = 0.07 + (self.atmat.loc[m, "energy"] - 0.07) * (self.emax_hb - 0.07) / (emax - 0.07)
+
+        # explicit pair energies
+        for pair, eps in self.pair_eps.items():
+            a, b = (tuple(pair) * 2)[:2]
+            m = ((self.atmat["attype1"] == a) & (self.atmat["attype2"] == b)) | ((self.atmat["attype1"] == b) & (self.atmat["attype2"] == a))
+            if not m.any():
+                raise ValueError(f"pair_eps: atomtype pair {a}-{b} not in the interaction matrix")
+            self.atmat.loc[m, "energy"] = eps
 
         self.special_nonlocal_dict = self.define_special_nonlocal_dict()
