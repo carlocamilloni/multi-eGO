@@ -217,6 +217,11 @@ atom_type_combinations = [
     # Tuple of atom type combinations for LJ14 pairs
     ("backbone_nitrogen", "sidechain_cb", None, 5.0e-7, -1),
     ("first_backbone_nitrogen", "backbone_nitrogen", None, 4.0e-6, 1),
+    # softer 1-5 backbone repulsions than the generic nonlocal c12: c12/r^12 = kT(300 K) at the 10th percentile of
+    # the crystal-helix distance. O(i)-C(i+1) 0.288 nm (n->pi* contact, median 0.300; generic O-C c12 2.064e-6 puts
+    # kT at 0.311 nm and stretches N(i+3)..O(i)); C(i)-N(i+2) 0.320 nm (median 0.330; generic N-C c12 3.421e-6)
+    ("backbone_oxygen", "backbone_carbonyl", None, 8.12e-7, 1),
+    ("backbone_carbonyl", "backbone_nitrogen", None, 2.88e-6, 2),
 ]
 
 # Special non-local interactions different from basic mg combination rules
