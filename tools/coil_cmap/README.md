@@ -23,14 +23,18 @@ The grids come from `src/multiego/data/coil_cmap_300K.npz`. This folder holds th
 - **Not covered by a CMAP:** ψ of a chain's first residue, φ of its last, and residues without a grid. These keep the original per-residue rtp cosines (`src/multiego/data/backbone_terminal_cosines.json`).
 - **Old-style input topologies:** backbone φ/ψ dihedrals in topologies made with the previous force field are replaced by the CMAP. `--no_coil_cmap` keeps the input dihedrals unchanged.
 
-**Bare references** (`data/bare_300K.npz`, uint32 φ/ψ counts on 5° cells; produced on 26 Nov 2026):
+**Bare references** (`data/bare_300K.npz`, uint32 φ/ψ counts on 5° cells; produced on 27 Nov 2026):
 - Systems: 20 ACE-X-NME and 400 ACE-X-Y-NME.
 - Force field: multi-ego-basic.ff at commit 5a3e97e8 (ideal bonded geometry), multi-eGO `--egos mg`, with every backbone φ/ψ dihedral removed (`strip_phipsi.py`).
+- mg prior at commit bb17f0ad: `ATT_SIGMA="rrep"`, softened local O(i)–C(i+1) and C(i)–N(i+2) pairs, directional backbone H-bond (H–O 1.3 kJ/mol at 0.20 nm, N–O 0.65 at 0.293 nm, C–H 0.65 at 0.31 nm) and the Cα contact fix (`PAIR_RMIN`/`PAIR_EPS` in `type_definitions.py`). Changing these defaults changes the bare distributions, so the library has to be refitted.
 - Box: 8 nm cubic.
 - `bare_300K.mdp`: sd, dt 5 fs, tau_t 25 ps, 300 K, cut-off 2.5 nm, 200 ns per run, frames every 2.5 ps. The first 1 ns is dropped, leaving 79,600 frames per run.
-- Convergence: half-run JSD has a median of 0.003 bits (max 0.006).
+- Convergence: half-run JSD has a median of 0.003 bits (max 0.013, CAP|LYS|PRO).
+- Clipping: 530 of the 8,820 grids put more than 10% of the target or bare probability on cells clipped at ±6 kT, almost all with Gly or Pro at the centre (sparse NDRD statistics); the worst is ASP|GLY|LYS (0.50).
 
-**Check.** Reweighting the ideal-geometry AB42 MG prior at 278 K from the previous AB42-specific NDRD CMAP onto this library moves the mean basins αR/β/PPII/αL from 42/25/19/14 to 35/30/23/12 (NDRD target 31/30/26/13), and the mean JSD to the target from 0.031 to 0.019 bits.
+**Check (27 Nov 2026 refit).** Ac-(AAQAA)3-NH2, mg prior, 303 K, 4 × 60 ns. Compared with the same prior on the 26 Nov library, the mean per-residue JSD to the TCB target drops from 0.086 to 0.043 bits. The mean αR/β/PPII/αL basins go from 58/11/27/4 to 51/19/27/4 (target 32/24/40/4), and DSSP H+G+I from 0.19 to 0.11 (experiment about 0.2 at 300 K). Rg goes from 0.83 to 0.86 nm. The old library did not cancel the single-residue αR preference that the directional H-bond pairs add, and that preference was propping up the helix.
+
+**Check (26 Nov 2026 library, previous prior).** Reweighting the ideal-geometry AB42 MG prior at 278 K from the previous AB42-specific NDRD CMAP onto that library moved the mean basins αR/β/PPII/αL from 42/25/19/14 to 35/30/23/12 (NDRD target 31/30/26/13), and the mean JSD to the target from 0.031 to 0.019 bits.
 
 ## Reproducing it
 
