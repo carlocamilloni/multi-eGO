@@ -411,11 +411,12 @@ EMAX_HB = None
 # PAIR_EPS {(atp1, atp2): epsilon} (positive = attractive) instead of the probability-derived energy
 # Defaults (27 Nov 2026):
 # - backbone H-bond made mildly directional by splitting it over H-O, N-O and C-H (minima from crystal H-bonds:
-#   H..O 0.20, N..O 0.293 (rrep), C..H 0.31 nm); scale tuned to ~20% DSSP helix of Ac-(AAQAA)3-NH2 at 303 K
+#   H..O 0.20, N..O 0.293 (rrep), C..H 0.31 nm); H-O : N-O : C-H = 2 : 1 : 1, scale (x0.90) tuned to ~20% DSSP helix
+#   of Ac-(AAQAA)3-NH2 at 303 K with the coil CMAP refitted on this prior (refit whenever these values change)
 # - CA-CA minimum 0.47 nm (crystal nonlocal CA-CA peak ~0.465; rrep 0.515 put antiparallel non-H-bonded pairs on the wall)
 # - CA-CB(Val/Ile, CH1b) attractive like CA-CB(Thr) (contact probability 0.009 fell just below P_TH_SC_BKBN)
 PAIR_RMIN = {("H", "O"): 0.20, ("C", "H"): 0.31, ("CAH", "CAH"): 0.47}
-PAIR_EPS = {("H", "O"): 1.3, ("N", "O"): 0.65, ("C", "H"): 0.65, ("CAH", "CH1b"): 0.095}
+PAIR_EPS = {("H", "O"): 1.8, ("N", "O"): 0.9, ("C", "H"): 0.9, ("CAH", "CH1b"): 0.095}
 
 SHOW = False
 
