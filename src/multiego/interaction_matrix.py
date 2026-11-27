@@ -268,8 +268,8 @@ class InteractionMatrix:
         special_nonlocal_dict = []
         for atom_pair in self.atmat["atom_pair"].unique():
             atp1, atp2 = atom_pair.split("_")
-            # write only H-O interaction, skip all the rest
-            if (atp1 == "H" and atp2 not in  H_interactions) or (atp2 == "H" and atp1 not in H_interactions):
+            # write only H-O interaction, skip all the rest (unless the pair has an explicit pair_eps)
+            if ((atp1 == "H" and atp2 not in H_interactions) or (atp2 == "H" and atp1 not in H_interactions)) and frozenset((atp1, atp2)) not in self.pair_eps:
                 continue
             energy = self.atmat.loc[self.atmat["atom_pair"]==atom_pair, "energy"].values[0]
             sigma = self.att_sigma_value(atp1, atp2)
