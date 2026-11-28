@@ -20,6 +20,18 @@ The grids come from `src/multiego/data/coil_cmap_300K.npz`. This folder holds th
   - clipped at ±6 kT;
   - 5° cells averaged onto the GROMACS grid corners.
 - **Coverage:** HIS is the single neutral form of the force field, CYS covers CYS2, and Pro is trans only.
+
+**Helix-propensity correction** (`helix_correction.py`, applied after the fit; since 28 Nov 2026):
+
+    V'(φ,ψ | L,X,R) = V(φ,ψ | L,X,R) + c_X · m(φ,ψ)
+
+- m is the helical box of Best, de Sancho & Mittal (2012), −100<φ<−30 and −67<ψ<−7, with logistic edges (7.5°), on the grid corners. The same c_X goes on all 441 grids with central residue X.
+- c_X is solved so that the single-residue helix free energy in A|X|A, −RT ln p_hel under bare × CMAP, reproduces the Moreau et al. 2009 ΔΔG relative to Ala at 300 K (`data/moreau2009_helix.dat`, J Am Chem Soc 131:13107, SI Tables 1–4).
+- The absolute level keeps 12 G_Ala + 3 G_Gln unchanged, so Ac-(AAQAA)3-NH2 helicity (to which the directional H-bond scale is tuned) does not move.
+- Pro is not corrected: its helix breaking is nonlocal (no amide H, constrains residue i−1).
+- c_X (kJ/mol): Ala −0.55, Ile −0.90, Met +0.13, Arg/Leu +0.39, Glu +1.2, Val +1.2, Asn +1.6, Gln +2.1, Lys +2.3, Phe/Asp/Gly +2.9–3.0, Cys +3.8, Tyr +4.0, Thr +4.3, Ser +4.9, His +5.2, Trp +5.5. Grids span −12 to +17 kJ/mol afterwards.
+- **Why:** without it the residue specificity of helix formation is exactly the single-residue helical-core population of the NDRD coil target (r 0.95 on Ac-(AAXAA)3-NH2; side chains add no measurable nonlocal term). Coil libraries exclude regular secondary structure, so they deplete strong helix formers (Ala, Leu, Glu, Lys) and keep turn/cap αR density (Ser, Asp, Thr, Trp): Trp and Ser came out more helical than Ala.
+- The uncorrected library of this prior is tagged `prior-hb090`.
 - **Not covered by a CMAP:** ψ of a chain's first residue, φ of its last, and residues without a grid. These keep the original per-residue rtp cosines (`src/multiego/data/backbone_terminal_cosines.json`).
 - **Old-style input topologies:** backbone φ/ψ dihedrals in topologies made with the previous force field are replaced by the CMAP. `--no_coil_cmap` keeps the input dihedrals unchanged.
 
@@ -34,6 +46,8 @@ The grids come from `src/multiego/data/coil_cmap_300K.npz`. This folder holds th
 
 **Previous parameterisation.** The ×0.65 prior (H–O 1.3, N–O/C–H 0.65) with its own library and bare data is tagged `prior-hb065` (commit 80d76320); this one is tagged `prior-hb090`. Both are kept so the two can be compared on the benchmarks before one is chosen.
 
+**Check (28 Nov 2026, helix correction).** Ac-(AAXAA)3-NH2, 303 K, 2 × 60 ns per guest (4 for Gln), Lifson–Roig fit with w_A and v_A from Ac-A15-NH2 (Best et al. 2012). Against Moreau (30 °C), 18 guests without Ala and Pro: r 0.50 → 0.97, RMSD 0.47 → 0.10 kcal/mol; Gly +1.03 (exp 1.02). AAQAA DSSP H+G+I stays at 0.19; the Ac-A15-NH2 helix fraction goes from 0.26 to 0.35. Coil 3J(HN,Hα) of blocked dipeptides rises by ~0.1 Hz (RMSD 0.24 → 0.26 Hz with Vögeli constants; r 0.86 → 0.88). A hairpin and a three-strand sheet still melt within ps, as without the correction; the unfolded hairpin has less spurious helix (5.4% → 1.6%).
+
 **Check (28 Nov 2026 refit, ×0.90 prior).** Ac-(AAQAA)3-NH2, 303 K, 4 × 60 ns: DSSP H+G+I 0.19 (×0.65 with its own library: 0.10), mean αR/β/PPII/αL 58/15/23/4 (target 32/23/41/4), Rg 0.83 nm. On the Ac-(AAXAA)3-NH2 guest series (Lifson–Roig, vs Moreau et al. 2009) both variants give the same residue ranking: Gly and Pro right, little specificity among the other residues (r 0.25–0.34).
 
 **Check (27 Nov 2026 refit, ×0.65 prior).** Ac-(AAQAA)3-NH2, mg prior, 303 K, 4 × 60 ns. Compared with the same prior on the 26 Nov library, the mean per-residue JSD to the TCB target drops from 0.086 to 0.043 bits. The mean αR/β/PPII/αL basins go from 58/11/27/4 to 51/19/27/4 (target 32/24/40/4), and DSSP H+G+I from 0.19 to 0.11 (experiment about 0.2 at 300 K). Rg goes from 0.83 to 0.86 nm. The old library did not cancel the single-residue αR preference that the directional H-bond pairs add, and that preference was propping up the helix.
@@ -47,12 +61,14 @@ The grids come from `src/multiego/data/coil_cmap_300K.npz`. This folder holds th
     xargs -P 8 -n 1 env WORK=$WORK PY=$PY bash setup_one.sh < sequences.txt   # 420 systems, about 8 min on 8 cores
     NP=4 WORK=$WORK bash run_all.sh                                          # about 21 core-hours; writes runs/*/dih
     $PY fit_coil_cmap.py bare --work $WORK --out data/bare_300K.npz
-    $PY fit_coil_cmap.py fit  --bare data/bare_300K.npz --lib <NDRD_TCB.txt> --out ../../src/multiego/data/coil_cmap_300K.npz
+    $PY fit_coil_cmap.py fit  --bare data/bare_300K.npz --lib <NDRD_TCB.txt> --out <uncorrected.npz>
+    $PY helix_correction.py --library <uncorrected.npz> --bare data/bare_300K.npz --out ../../src/multiego/data/coil_cmap_300K.npz
     $PY fit_coil_cmap.py check --library ../../src/multiego/data/coil_cmap_300K.npz --lib <NDRD_TCB.txt> \
         --top <topology of a run> --dih <run>/dih --temp <K> [--old-grids <npz of the run's current CMAP>]
 
 - `build.py`: builds G-X(-Y)-G with PeptideBuilder and cuts the glycines to ACE/NME.
 - `coil_lib.py`: the NDRD reader and grid utilities.
+- `helix_correction.py`: the Moreau-fitted helix-propensity correction (prints c_X and the before/after single-residue ΔΔG).
 - The NDRD library file (`NDRD_TCB.txt`, about 300 MB) is not included. Download it from https://dunbrack.fccc.edu/lab/ndrd.
 
 Coil target: D. Ting, G. Wang, M. Shapovalov, R. Mitra, M. I. Jordan, R. L. Dunbrack Jr., *Neighbor-dependent Ramachandran probability distributions of amino acids developed from a hierarchical Dirichlet process model*, PLoS Comput Biol 6:e1000763 (2010).

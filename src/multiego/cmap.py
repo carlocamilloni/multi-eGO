@@ -5,7 +5,8 @@ multi-ego-basic.ff no longer defines backbone phi/psi proper dihedrals: each pro
 backbone neighbours gets a neighbour-dependent CMAP V(phi, psi | L, X, R) from the transferable library in
 ``data/coil_cmap_300K.npz``. The library was fitted at 300 K against the NDRD TCB coil library (Ting et al.
 PLoS Comput Biol 6:e1000763, 2010; https://dunbrack.fccc.edu/lab/ndrd; CC BY 4.0), using bare multi-eGO MG references of ACE-X-NME and ACE-X-Y-NME peptides
-(see tools/coil_cmap). L or R is ``CAP`` when the neighbour is a cap (ACE, NME, NH2) or a residue without
+(see tools/coil_cmap), plus a residue-specific helix-propensity correction on the helical core fitted to the
+Moreau et al. 2009 host-guest data (tools/coil_cmap/helix_correction.py). L or R is ``CAP`` when the neighbour is a cap (ACE, NME, NH2) or a residue without
 library data.
 
 In multi-ego-basic.ff each residue carries one zero-strength placeholder per backbone torsion (``gd_cmap``), which
