@@ -363,7 +363,23 @@ def init_LJ_datasets(meGO_ensemble, matrices, args):
 
     # vectorized replace: use matched c12 where found, else keep existing rep
     train_dataset["rep"] = train_dataset["type_pair"].map(c12_lookup).fillna(0)
-    # print(train_dataset[["ai", "aj", "type_pair", "rep"]].head(10))
+
+    # Local protein rules (type_definitions.atom_type_combinations) replace the type-table c12 for
+    # specific same-chain pairs. make_mat uses them for the intramolecular cutoffs and pairs.py writes
+    # them as pairs, so rep must follow them too. Pairs at <= 3 bonds were already removed above; this
+    # matters for the 1-5 backbone rules, e.g. O(i)-C(i+1) and C(i)-N(i+2).
+    pairs14 = bonded.generate_14_data(meGO_ensemble)
+    if not pairs14.empty:
+        mol_names = pairs14["molecule_name_ai"].astype(str).str.split("_", n=1).str[1]
+        pairs14 = pairs14.loc[mol_names.map(meGO_ensemble.molecule_type_dict).eq("protein").to_numpy()]
+    if not pairs14.empty:
+        # later rules override earlier ones for the same pair, as in make_mat.generate_c12_values
+        local_c12 = pairs14.assign(ai=pairs14["ai"].astype(str), aj=pairs14["aj"].astype(str))
+        local_c12 = local_c12.drop_duplicates(subset=["ai", "aj"], keep="last").set_index(["ai", "aj"])["c12"]
+        key = pd.MultiIndex.from_arrays([train_dataset["ai"].astype(str), train_dataset["aj"].astype(str)])
+        local_rep = local_c12.reindex(key).to_numpy(dtype=float)
+        is_local = train_dataset["same_chain"].fillna(False).astype(bool).to_numpy() & ~np.isnan(local_rep)
+        train_dataset["rep"] = np.where(is_local, local_rep, train_dataset["rep"].to_numpy(dtype=float))
 
     # default (mg) sigma
     pairwise_mg_sigma = (
