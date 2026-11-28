@@ -34,6 +34,8 @@ The grids come from `src/multiego/data/coil_cmap_300K.npz`. This folder holds th
 
 **Previous parameterisation.** The ×0.65 prior (H–O 1.3, N–O/C–H 0.65) with its own library and bare data is tagged `prior-hb065` (commit 80d76320); this one is tagged `prior-hb090`. Both are kept so the two can be compared on the benchmarks before one is chosen.
 
+**Check (28 Nov 2026 refit, ×0.90 prior).** Ac-(AAQAA)3-NH2, 303 K, 4 × 60 ns: DSSP H+G+I 0.19 (×0.65 with its own library: 0.10), mean αR/β/PPII/αL 58/15/23/4 (target 32/23/41/4), Rg 0.83 nm. On the Ac-(AAXAA)3-NH2 guest series (Lifson–Roig, vs Moreau et al. 2009) both variants give the same residue ranking: Gly and Pro right, little specificity among the other residues (r 0.25–0.34).
+
 **Check (27 Nov 2026 refit, ×0.65 prior).** Ac-(AAQAA)3-NH2, mg prior, 303 K, 4 × 60 ns. Compared with the same prior on the 26 Nov library, the mean per-residue JSD to the TCB target drops from 0.086 to 0.043 bits. The mean αR/β/PPII/αL basins go from 58/11/27/4 to 51/19/27/4 (target 32/24/40/4), and DSSP H+G+I from 0.19 to 0.11 (experiment about 0.2 at 300 K). Rg goes from 0.83 to 0.86 nm. The old library did not cancel the single-residue αR preference that the directional H-bond pairs add, and that preference was propping up the helix.
 
 **Check (26 Nov 2026 library, previous prior).** Reweighting the ideal-geometry AB42 MG prior at 278 K from the previous AB42-specific NDRD CMAP onto that library moved the mean basins αR/β/PPII/αL from 42/25/19/14 to 35/30/23/12 (NDRD target 31/30/26/13), and the mean JSD to the target from 0.031 to 0.019 bits.
