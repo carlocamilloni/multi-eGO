@@ -10,6 +10,7 @@ from matplotlib.cm import ScalarMappable
 
 bkbn_attypes = ["H", "O", "N", "C", "CAH"]#, "CAH2"]
 H_interactions = ["O", "H", "OA", "OM", "OS"]
+HB_acceptors = ["O", "OA", "OM", "OS"]
 
 noplot = ["C0", "CH3p", "CR1", "OE", "P"]
 
@@ -27,7 +28,24 @@ class RemapUnpickler(pickle.Unpickler):
 
 class InteractionMatrix:
 
-    def __init__(self, pkl_file, emax=0.16, c12_rep_df=None, pth=None, show=False, pth_bkbn=None, emax_bkbn=None, pth_sc_bkbn=None, emax_sc_bkbn=None, om_scaledown=None, pkl_file2=None, r2_corr_sb=None):
+    def __init__(self, pkl_file, emax=0.16, c12_rep_df=None, pth=None, show=False, pth_bkbn=None, emax_bkbn=None, pth_sc_bkbn=None, emax_sc_bkbn=None, om_scaledown=None, pkl_file2=None, r2_corr_sb=None, att_sigma="exp_aver", emax_hb=None, pair_rmin=None, pair_eps=None):
+        # att_sigma: how the LJ sigma of attractive pairs is set (rmin = 2^(1/6) sigma):
+        #   "exp_aver" soft-min of the contact histogram (~5th percentile, the c12 average of make_mat)
+        #   "rrep"     sigma = c12_rep^(1/12) from c12_rep_df, i.e. the attractive LJ shares sigma with the
+        #              repulsive table (rmin = 2^(1/6) c12_rep^(1/12), which matches the KDE contact peak
+        #              wherever the pair has one)
+        if att_sigma not in ("exp_aver", "rrep"):
+            raise ValueError(f"att_sigma must be 'exp_aver' or 'rrep', not {att_sigma!r}")
+        self.att_sigma = att_sigma
+        # emax_hb: separate energy scale of the attractive H-acceptor pairs (H with O, OA, OM, OS); None keeps them
+        # in their bkbn-bkbn / sc-bkbn class. The strongest H-bond pair of a class gets emax_hb, the others scale
+        # linearly within [0.07, emax_hb] keeping their position in the class.
+        self.emax_hb = emax_hb
+        # pair_rmin: {(atp1, atp2): rmin_nm} LJ minimum of attractive atomtype pairs, overriding att_sigma for those pairs
+        # pair_eps:  {(atp1, atp2): epsilon} energy of atomtype pairs, overriding the probability-derived value
+        #            (positive = attractive); applied after EMAX_HB
+        self.pair_rmin = {frozenset(k): v for k, v in (pair_rmin or {}).items()}
+        self.pair_eps = {frozenset(k): v for k, v in (pair_eps or {}).items()}
         self.atmat = self.build_matrix_dataframe(pkl_file, filename2=pkl_file2, r2_corr_sb=r2_corr_sb)
         self.emax = emax
         self.emax_bkbn = emax_bkbn if emax_bkbn is not None else emax
@@ -225,6 +243,23 @@ class InteractionMatrix:
             atmat.loc[atmat["r2"].notnull(), "probability"] -= atmat.loc[atmat["r2"].notnull(), "probability"] * atmat.loc[atmat["r2"].notnull(), "r2"]
         return atmat
 
+    def c12_rep(self, atp1, atp2):
+        """repulsive c12 of an atomtype pair from c12_rep_df (either order)"""
+        df = self.c12_rep_df
+        row = df.loc[((df["atp1"] == atp1) & (df["atp2"] == atp2)) | ((df["atp1"] == atp2) & (df["atp2"] == atp1)), "c12"]
+        if len(row) == 0:
+            raise ValueError(f"no repulsive c12 for the atomtype pair {atp1}-{atp2}")
+        return float(row.values[0])
+
+    def att_sigma_value(self, atp1, atp2):
+        """LJ sigma of an attractive atomtype pair, following self.att_sigma (and self.pair_rmin overrides)"""
+        if frozenset((atp1, atp2)) in self.pair_rmin:
+            return self.pair_rmin[frozenset((atp1, atp2))] / 2 ** (1 / 6)
+        if self.att_sigma == "rrep":
+            return self.c12_rep(atp1, atp2) ** (1 / 12)
+        exp_aver = self.atmat.loc[self.atmat["atom_pair"] == f"{atp1}_{atp2}", "exp_aver"].values[0]
+        return exp_aver / 2 ** (1 / 6)
+
     def define_special_nonlocal_dict(self):
         """
         Define the special_nonlocal_dict based on the energy values in atmat.
@@ -233,11 +268,11 @@ class InteractionMatrix:
         special_nonlocal_dict = []
         for atom_pair in self.atmat["atom_pair"].unique():
             atp1, atp2 = atom_pair.split("_")
-            # write only H-O interaction, skip all the rest
-            if (atp1 == "H" and atp2 not in  H_interactions) or (atp2 == "H" and atp1 not in H_interactions):
+            # write only H-O interaction, skip all the rest (unless the pair has an explicit pair_eps)
+            if ((atp1 == "H" and atp2 not in H_interactions) or (atp2 == "H" and atp1 not in H_interactions)) and frozenset((atp1, atp2)) not in self.pair_eps:
                 continue
             energy = self.atmat.loc[self.atmat["atom_pair"]==atom_pair, "energy"].values[0]
-            sigma = self.atmat.loc[self.atmat["atom_pair"]==atom_pair, "exp_aver"].values[0] / 2**(1/6)
+            sigma = self.att_sigma_value(atp1, atp2)
             if energy > 0:
                 special_nonlocal_dict.append({
                     "atomtypes": ([atom_pair.split("_")[0]], [atom_pair.split("_")[1]]),
@@ -267,5 +302,20 @@ class InteractionMatrix:
         # bkbn-bkbn
         condition_bkbn_bkbn = self.atmat["attype1"].isin(bkbn_attypes) & self.atmat["attype2"].isin(bkbn_attypes)
         self.atmat.loc[ condition_bkbn_bkbn, "energy"] = np.array(self.regall(self.atmat.loc[condition_bkbn_bkbn, "probability"].to_numpy(), 1, self.emax_bkbn, self.pth_bkbn))
+        # H-bond pairs on their own energy scale
+        if self.emax_hb is not None:
+            a1, a2 = self.atmat["attype1"], self.atmat["attype2"]
+            hb = ((a1 == "H") & a2.isin(HB_acceptors)) | ((a2 == "H") & a1.isin(HB_acceptors))
+            for cond, emax in ((condition_bkbn_bkbn, self.emax_bkbn), (condition_sc_bkbn, self.emax_sc_bkbn)):
+                m = hb & cond & (self.atmat["energy"] > 0)
+                self.atmat.loc[m, "energy"] = 0.07 + (self.atmat.loc[m, "energy"] - 0.07) * (self.emax_hb - 0.07) / (emax - 0.07)
+
+        # explicit pair energies
+        for pair, eps in self.pair_eps.items():
+            a, b = (tuple(pair) * 2)[:2]
+            m = ((self.atmat["attype1"] == a) & (self.atmat["attype2"] == b)) | ((self.atmat["attype1"] == b) & (self.atmat["attype2"] == a))
+            if not m.any():
+                raise ValueError(f"pair_eps: atomtype pair {a}-{b} not in the interaction matrix")
+            self.atmat.loc[m, "energy"] = eps
 
         self.special_nonlocal_dict = self.define_special_nonlocal_dict()

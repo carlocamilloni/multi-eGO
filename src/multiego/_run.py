@@ -11,6 +11,7 @@ import gc
 import time
 
 from multiego import arguments
+from multiego import cmap
 from multiego import contacts
 from multiego import generate_face
 from multiego import fileio as io
@@ -154,6 +155,22 @@ def _main(root_dir, bt):
     et = time.time()
     _term.section_timing(et - st)
     st = et
+
+    if not args.no_coil_cmap:
+        _term.header("Backbone coil CMAP")
+        meGO_ensembles.backbone_terms = cmap.build_backbone_terms(meGO_ensembles)
+        for molecule, data in meGO_ensembles.backbone_terms["molecules"].items():
+            msg = f"  {molecule}: {len(data['types'])} CMAPs"
+            if data["removed"]:
+                msg += f", {data['removed']} backbone phi/psi dihedrals of the input topology replaced"
+            if data["added"]:
+                msg += f", {data['added']} terminal phi/psi cosines added"
+            print(msg)
+            if data["missing"]:
+                _term.warn(f"  {molecule}: no backbone term for {', '.join(data['missing'])}")
+        et = time.time()
+        _term.section_timing(et - st)
+        st = et
 
     _term.header("Writing Multi-eGO model")
     with _term.spinner("writing files"):

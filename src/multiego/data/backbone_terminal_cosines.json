@@ -1,0 +1,699 @@
+{
+ "_doc": "Backbone phi (-C N CA C) and psi (N CA C +N) proper dihedrals (funct 1, kJ/mol) of each residue in multi-ego-basic.ff/aminoacids.rtp before they were removed in favour of the coil CMAP. multi-eGO writes them only for the chain-terminal torsions that a CMAP cannot cover (psi of the first residue, phi of the last).",
+ "ALA": {
+  "phi": [
+   {
+    "define": "gd_44A",
+    "phase": 170.0,
+    "k": 2.7,
+    "mult": 1
+   },
+   {
+    "define": "gd_44bA",
+    "phase": 50.0,
+    "k": 1.7,
+    "mult": 3
+   },
+   {
+    "define": "gd_43A",
+    "phase": 70.0,
+    "k": 2.0,
+    "mult": 2
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45A",
+    "phase": 180.0,
+    "k": 4.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_42A",
+    "phase": 80.0,
+    "k": 2.5,
+    "mult": 2
+   }
+  ]
+ },
+ "ARG": {
+  "phi": [
+   {
+    "define": "gd_44R",
+    "phase": -150.0,
+    "k": 2.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_43R",
+    "phase": 90.0,
+    "k": 0.5,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45R",
+    "phase": 180.0,
+    "k": 3.6,
+    "mult": 1
+   },
+   {
+    "define": "gd_42R",
+    "phase": 95.0,
+    "k": 1.6,
+    "mult": 2
+   }
+  ]
+ },
+ "ASN": {
+  "phi": [
+   {
+    "define": "gd_44N",
+    "phase": -120.0,
+    "k": 4.0,
+    "mult": 1
+   },
+   {
+    "define": "gd_44Nb",
+    "phase": 20.0,
+    "k": 0.7,
+    "mult": 4
+   },
+   {
+    "define": "gd_43N",
+    "phase": -120.0,
+    "k": 0.0,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45N",
+    "phase": 180.0,
+    "k": 0.6,
+    "mult": 1
+   },
+   {
+    "define": "gd_42N",
+    "phase": 100.0,
+    "k": 1.4,
+    "mult": 2
+   }
+  ]
+ },
+ "ASP": {
+  "phi": [
+   {
+    "define": "gd_44D",
+    "phase": -150.0,
+    "k": 4.0,
+    "mult": 1
+   },
+   {
+    "define": "gd_43D",
+    "phase": 100.0,
+    "k": 0.8,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45D",
+    "phase": 180.0,
+    "k": 1.0,
+    "mult": 1
+   },
+   {
+    "define": "gd_42D",
+    "phase": 120.0,
+    "k": 1.0,
+    "mult": 2
+   }
+  ]
+ },
+ "CYS": {
+  "phi": [
+   {
+    "define": "gd_44C",
+    "phase": -150.0,
+    "k": 3.3,
+    "mult": 1
+   },
+   {
+    "define": "gd_43Cb",
+    "phase": -110.0,
+    "k": 1.0,
+    "mult": 2
+   },
+   {
+    "define": "gd_43C",
+    "phase": 70.0,
+    "k": 0.0,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45C",
+    "phase": 0.0,
+    "k": 0.0,
+    "mult": 1
+   },
+   {
+    "define": "gd_42C",
+    "phase": 100.0,
+    "k": 1.0,
+    "mult": 2
+   }
+  ]
+ },
+ "CYS2": {
+  "phi": [
+   {
+    "define": "gd_44C",
+    "phase": -150.0,
+    "k": 3.3,
+    "mult": 1
+   },
+   {
+    "define": "gd_43Cb",
+    "phase": -110.0,
+    "k": 1.0,
+    "mult": 2
+   },
+   {
+    "define": "gd_43C",
+    "phase": 70.0,
+    "k": 0.0,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45C",
+    "phase": 0.0,
+    "k": 0.0,
+    "mult": 1
+   },
+   {
+    "define": "gd_42C",
+    "phase": 100.0,
+    "k": 1.0,
+    "mult": 2
+   }
+  ]
+ },
+ "GLN": {
+  "phi": [
+   {
+    "define": "gd_44Q",
+    "phase": -155.0,
+    "k": 2.6,
+    "mult": 1
+   },
+   {
+    "define": "gd_43Q",
+    "phase": 90.0,
+    "k": 0.7,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45Q",
+    "phase": 180.0,
+    "k": 3.0,
+    "mult": 1
+   },
+   {
+    "define": "gd_42Q",
+    "phase": 90.0,
+    "k": 1.5,
+    "mult": 2
+   }
+  ]
+ },
+ "GLU": {
+  "phi": [
+   {
+    "define": "gd_44E",
+    "phase": -160.0,
+    "k": 2.1,
+    "mult": 1
+   },
+   {
+    "define": "gd_43E",
+    "phase": 90.0,
+    "k": 1.8,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45E",
+    "phase": 170.0,
+    "k": 5.0,
+    "mult": 1
+   },
+   {
+    "define": "gd_42E",
+    "phase": 90.0,
+    "k": 2.1,
+    "mult": 2
+   }
+  ]
+ },
+ "GLY": {
+  "phi": [
+   {
+    "define": "gd_49G",
+    "phase": 180.0,
+    "k": 5.0,
+    "mult": 1
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_51G",
+    "phase": 180.0,
+    "k": 0.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_48G",
+    "phase": 180.0,
+    "k": 5.0,
+    "mult": 2
+   }
+  ]
+ },
+ "HIS": {
+  "phi": [
+   {
+    "define": "gd_44H",
+    "phase": -125.0,
+    "k": 2.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_44Hb",
+    "phase": 60.0,
+    "k": 0.5,
+    "mult": 4
+   },
+   {
+    "define": "gd_43H",
+    "phase": 90.0,
+    "k": 0.3,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45H",
+    "phase": 0.0,
+    "k": 0.0,
+    "mult": 1
+   },
+   {
+    "define": "gd_42H",
+    "phase": 100.0,
+    "k": 1.3,
+    "mult": 2
+   }
+  ]
+ },
+ "ILE": {
+  "phi": [
+   {
+    "define": "gd_44I",
+    "phase": 70.0,
+    "k": 0.0,
+    "mult": 1
+   },
+   {
+    "define": "gd_43I",
+    "phase": 80.0,
+    "k": 2.4,
+    "mult": 3
+   },
+   {
+    "define": "gd_43Ib",
+    "phase": -10.0,
+    "k": 3.0,
+    "mult": 2
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45I",
+    "phase": 180.0,
+    "k": 3.1,
+    "mult": 1
+   },
+   {
+    "define": "gd_42I",
+    "phase": 90.0,
+    "k": 2.0,
+    "mult": 2
+   }
+  ]
+ },
+ "LEU": {
+  "phi": [
+   {
+    "define": "gd_44L",
+    "phase": -160.0,
+    "k": 1.8,
+    "mult": 1
+   },
+   {
+    "define": "gd_43L",
+    "phase": 90.0,
+    "k": 1.8,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45L",
+    "phase": 180.0,
+    "k": 6.1,
+    "mult": 1
+   },
+   {
+    "define": "gd_42L",
+    "phase": 90.0,
+    "k": 2.1,
+    "mult": 2
+   }
+  ]
+ },
+ "LYS": {
+  "phi": [
+   {
+    "define": "gd_44K",
+    "phase": -125.0,
+    "k": 2.0,
+    "mult": 1
+   },
+   {
+    "define": "gd_44Kb",
+    "phase": 60.0,
+    "k": 0.5,
+    "mult": 4
+   },
+   {
+    "define": "gd_43K",
+    "phase": 90.0,
+    "k": 0.3,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45K",
+    "phase": 180.0,
+    "k": 1.9,
+    "mult": 1
+   },
+   {
+    "define": "gd_42K",
+    "phase": 100.0,
+    "k": 1.5,
+    "mult": 2
+   }
+  ]
+ },
+ "MET": {
+  "phi": [
+   {
+    "define": "gd_44M",
+    "phase": -160.0,
+    "k": 3.0,
+    "mult": 1
+   },
+   {
+    "define": "gd_43M",
+    "phase": 90.0,
+    "k": 0.9,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45M",
+    "phase": 180.0,
+    "k": 3.4,
+    "mult": 1
+   },
+   {
+    "define": "gd_42M",
+    "phase": 90.0,
+    "k": 2.5,
+    "mult": 2
+   }
+  ]
+ },
+ "PHE": {
+  "phi": [
+   {
+    "define": "gd_44F",
+    "phase": 100.0,
+    "k": 2.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_43Fb",
+    "phase": -120.0,
+    "k": 1.7,
+    "mult": 2
+   },
+   {
+    "define": "gd_43F",
+    "phase": 80.0,
+    "k": 0.0,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45F",
+    "phase": 180.0,
+    "k": 0.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_42F",
+    "phase": 100.0,
+    "k": 2.4,
+    "mult": 2
+   }
+  ]
+ },
+ "PRO": {
+  "phi": [
+   {
+    "define": "gd_53P",
+    "phase": -10.0,
+    "k": 4.0,
+    "mult": 4
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_55P",
+    "phase": 180.0,
+    "k": 0.6,
+    "mult": 1
+   },
+   {
+    "define": "gd_52P",
+    "phase": 170.0,
+    "k": 5.0,
+    "mult": 2
+   }
+  ]
+ },
+ "SER": {
+  "phi": [
+   {
+    "define": "gd_44S",
+    "phase": -125.0,
+    "k": 2.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_44Sb",
+    "phase": 60.0,
+    "k": 0.5,
+    "mult": 4
+   },
+   {
+    "define": "gd_43S",
+    "phase": 30.0,
+    "k": 0.0,
+    "mult": 3
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45S",
+    "phase": 180.0,
+    "k": 0.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_42S",
+    "phase": 100.0,
+    "k": 1.1,
+    "mult": 2
+   }
+  ]
+ },
+ "THR": {
+  "phi": [
+   {
+    "define": "gd_44T",
+    "phase": 100.0,
+    "k": 2.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_43T",
+    "phase": 80.0,
+    "k": 0.0,
+    "mult": 3
+   },
+   {
+    "define": "gd_43Tb",
+    "phase": -120.0,
+    "k": 1.7,
+    "mult": 2
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45T",
+    "phase": 180.0,
+    "k": 0.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_42T",
+    "phase": 100.0,
+    "k": 2.4,
+    "mult": 2
+   }
+  ]
+ },
+ "TRP": {
+  "phi": [
+   {
+    "define": "gd_44W",
+    "phase": -130.0,
+    "k": 1.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_43W",
+    "phase": 90.0,
+    "k": 0.2,
+    "mult": 3
+   },
+   {
+    "define": "gd_43Wb",
+    "phase": 60.0,
+    "k": 0.8,
+    "mult": 2
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45W",
+    "phase": 0.0,
+    "k": 1.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_42W",
+    "phase": 100.0,
+    "k": 1.2,
+    "mult": 2
+   }
+  ]
+ },
+ "TYR": {
+  "phi": [
+   {
+    "define": "gd_44Y",
+    "phase": -120.0,
+    "k": 1.3,
+    "mult": 1
+   },
+   {
+    "define": "gd_43Y",
+    "phase": 80.0,
+    "k": 0.0,
+    "mult": 3
+   },
+   {
+    "define": "gd_43Yb",
+    "phase": -120.0,
+    "k": 1.7,
+    "mult": 2
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45Y",
+    "phase": 0.0,
+    "k": 0.2,
+    "mult": 1
+   },
+   {
+    "define": "gd_42Y",
+    "phase": 100.0,
+    "k": 2.4,
+    "mult": 2
+   }
+  ]
+ },
+ "VAL": {
+  "phi": [
+   {
+    "define": "gd_44V",
+    "phase": 100.0,
+    "k": 2.5,
+    "mult": 1
+   },
+   {
+    "define": "gd_43V",
+    "phase": 90.0,
+    "k": 0.3,
+    "mult": 3
+   },
+   {
+    "define": "gd_43Vb",
+    "phase": -120.0,
+    "k": 1.7,
+    "mult": 2
+   }
+  ],
+  "psi": [
+   {
+    "define": "gd_45V",
+    "phase": 180.0,
+    "k": 1.0,
+    "mult": 1
+   },
+   {
+    "define": "gd_42V",
+    "phase": 100.0,
+    "k": 2.4,
+    "mult": 2
+   }
+  ]
+ }
+}

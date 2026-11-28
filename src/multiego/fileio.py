@@ -349,6 +349,7 @@ def write_model(meGO_ensemble, meGO_LJ, meGO_LJ_14, parameters, stat_str):
         get_outdir_name(f"{parameters.outputs_dir}/{parameters.system}", parameters.explicit_name, parameters.egos)
     )
     create_output_directories(parameters, output_dir)
+    backbone_terms = getattr(meGO_ensemble, "backbone_terms", None) or {}
     write_topology(
         meGO_ensemble.topology_dataframe,
         meGO_ensemble.molecule_type_dict,
@@ -356,7 +357,14 @@ def write_model(meGO_ensemble, meGO_LJ, meGO_LJ_14, parameters, stat_str):
         meGO_LJ_14,
         parameters,
         output_dir,
+        backbone_terms=backbone_terms,
     )
+    if any(d["types"] for d in backbone_terms.get("molecules", {}).values()):
+        from . import cmap
+
+        cmap.write_cmap_itp(
+            backbone_terms, f"{output_dir}/coil_cmap.itp", make_header(vars(parameters), not parameters.no_header)
+        )
     meGO_LJ = sort_LJ(meGO_ensemble, meGO_LJ)
     write_nonbonded(meGO_ensemble.topology_dataframe, meGO_LJ, parameters, output_dir)
     save_matrix_png(output_dir)
@@ -402,12 +410,18 @@ def write_output_readme(meGO_LJ, parameters, output_dir, stat_str):
             f.write(f" - P_TH_SC_BKBN: {type_definitions.P_TH_SC_BKBN}\n")
             f.write(f" - EMAX_SC_BKBN: {type_definitions.EMAX_SC_BKBN}\n")
             f.write(f" - OM_SCALEDOWN: {type_definitions.OM_SCALEDOWN}\n")
+            f.write(f" - ATT_SIGMA: {type_definitions.ATT_SIGMA}\n")
+            f.write(f" - EMAX_HB: {type_definitions.EMAX_HB}\n")
+            f.write(f" - PAIR_RMIN: {type_definitions.PAIR_RMIN}\n")
+            f.write(f" - PAIR_EPS: {type_definitions.PAIR_EPS}\n")
+
 
 def save_matrix_png(output_path):
     # import matrix from type definition and use the class function to plot it
     from .type_definitions import matrix
+
     matrix.plot_energy_matrix(out_path=f"{output_path}/energy_matrix.png", show=False)
-    
+
 
 def print_stats(meGO_LJ):
     # it would be nice to cycle over molecule types and print an half matrix with all the relevant information
@@ -581,6 +595,7 @@ def write_topology(
     meGO_LJ_14,
     parameters,
     output_folder,
+    backbone_terms=None,
 ):
     """
     Writes the topology output content into topol_mego.top
@@ -599,9 +614,14 @@ def write_topology(
         Contains the command-line parsed parameters
     output_folder : str
         Path to the ouput directory
+    backbone_terms : dict, optional
+        Output of ``cmap.build_backbone_terms``; when it holds CMAPs, ``coil_cmap.itp`` is included after
+        ``ffnonbonded.itp`` and a ``[ cmap ]`` section is written for each molecule.
     """
     write_header = not parameters.no_header
     molecule_footer = []
+    cmap_molecules = (backbone_terms or {}).get("molecules", {})
+    has_cmap = any(d["types"] for d in cmap_molecules.values())
     header = make_header(vars(parameters), write_header)
 
     with open(f"{output_folder}/topol_mego.top", "w") as file:
@@ -609,6 +629,8 @@ def write_topology(
 ; Include forcefield parameters
 #include "ffnonbonded.itp"
 """
+        if has_cmap:
+            header += '#include "coil_cmap.itp"\n'
 
         file.write(header)
         for molecule, bonded_interactions in bonded_interactions_dict.items():
@@ -642,6 +664,11 @@ def write_topology(
                     file.write(dataframe_to_write(interactions, float_format="%.6e"))
                 else:
                     file.write(dataframe_to_write(interactions))
+                file.write("\n\n")
+            cmap_rows = cmap_molecules.get(molecule, {}).get("cmap")
+            if cmap_rows is not None and not cmap_rows.empty:
+                file.write("[ cmap ]\n")
+                file.write(dataframe_to_write(cmap_rows))
                 file.write("\n\n")
             file.write("[ exclusions ]\n")
             file.write(dataframe_to_write(exclusions))

@@ -87,11 +87,8 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44A
-   -C     N    CA     C     gd_44bA
-   -C     N    CA     C     gd_43A
-    N    CA     C    +N     gd_45A
-    N    CA     C    +N     gd_42A
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
 
 [ ARG ]
  [ atoms ]
@@ -147,11 +144,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44R
-   -C     N    CA     C     gd_43R
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    CG     gd_34
-    N    CA     C    +N     gd_45R
-    N    CA     C    +N     gd_42R
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG    CD     gd_34
    CB    CG    CD    NE     gd_34
    CG    CD    NE    CZ     gd_39
@@ -202,12 +197,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44N
-   -C     N    CA     C     gd_44Nb
-   -C     N    CA     C     gd_43N
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    CG     gd_34
-    N    CA     C    +N     gd_45N
-    N    CA     C    +N     gd_42N
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG   ND2     gd_40
 
 [ ASP ]
@@ -255,11 +247,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44D
-   -C     N    CA     C     gd_43D
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    CG     gd_34
-    N    CA     C    +N     gd_45D
-    N    CA     C    +N     gd_42D
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG   OD1     gd_40
 
 [ CYS ]
@@ -299,12 +289,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44C
-   -C     N    CA     C     gd_43Cb
-   -C     N    CA     C     gd_43C
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    SG     gd_34
-    N    CA     C    +N     gd_45C
-    N    CA     C    +N     gd_42C
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
 
 [ CYS2 ]
  [ atoms ]
@@ -343,12 +330,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44C
-   -C     N    CA     C     gd_43Cb
-   -C     N    CA     C     gd_43C
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    SG     gd_34
-    N    CA     C    +N     gd_45C
-    N    CA     C    +N     gd_42C
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
 
 [ GLN ]
  [ atoms ]
@@ -398,11 +382,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44Q
-   -C     N    CA     C     gd_43Q
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    CG     gd_34
-    N    CA     C    +N     gd_45Q
-    N    CA     C    +N     gd_42Q
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG    CD     gd_34
    CB    CG    CD   NE2     gd_40
 
@@ -454,11 +436,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44E
-   -C     N    CA     C     gd_43E
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    CG     gd_34
-    N    CA     C    +N     gd_45E
-    N    CA     C    +N     gd_42E
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG    CD     gd_34
    CB    CG    CD   OE2     gd_40
 
@@ -491,9 +471,8 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_49G
-    N    CA     C    +N     gd_51G
-    N    CA     C    +N     gd_48G
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
 
 [ HIS ]
  [ atoms ]
@@ -554,12 +533,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44H
-   -C     N    CA     C     gd_44Hb
-   -C     N    CA     C     gd_43H
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    CG     gd_34
-    N    CA     C    +N     gd_45H
-    N    CA     C    +N     gd_42H
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG   ND1     gd_40
 
 [ ILE ]
@@ -607,12 +583,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44I
-   -C     N    CA     C     gd_43I
-   -C     N    CA     C     gd_43Ib
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB   CG1     gd_34
-    N    CA     C    +N     gd_45I
-    N    CA     C    +N     gd_42I
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB   CG1    CD     gd_34
 
 [ LEU ]
@@ -660,11 +633,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44L
-   -C     N    CA     C     gd_43L
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    CG     gd_34
-    N    CA     C    +N     gd_45L
-    N    CA     C    +N     gd_42L
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG   CD1     gd_34
 
 [ LYS ]
@@ -713,12 +684,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44K
-   -C     N    CA     C     gd_44Kb
-   -C     N    CA     C     gd_43K
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    CG     gd_34
-    N    CA     C    +N     gd_45K
-    N    CA     C    +N     gd_42K
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG    CD     gd_34
    CB    CG    CD    CE     gd_34
    CG    CD    CE    NZ     gd_34
@@ -766,11 +734,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44M
-   -C     N    CA     C     gd_43M
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    CG     gd_34
-    N    CA     C    +N     gd_45M
-    N    CA     C    +N     gd_42M
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG    SD     gd_34
    CB    CG    SD    CE     gd_26
 
@@ -837,12 +803,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44F
-   -C     N    CA     C     gd_43Fb
-   -C     N    CA     C     gd_43F
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    CG     gd_34
-    N    CA     C    +N     gd_45F
-    N    CA     C    +N     gd_42F
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG   CD1     gd_40
 
 [ PRO ]
@@ -886,11 +849,10 @@
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_56P
 ;  -C     N    CA     C     gd_54
-   -C     N    CA     C     gd_53P
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
    CA     N    CD    CG     gd_zero  ; zero: 3-fold ring torsion strains the 5-ring (pucker set by angles)
     N    CA    CB    CG     gd_zero  ; zero: 3-fold ring torsion strains the 5-ring (pucker set by angles)
-    N    CA     C    +N     gd_55P
-    N    CA     C    +N     gd_52P
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG    CD     gd_zero  ; zero: 3-fold ring torsion strains the 5-ring (pucker set by angles)
    CB    CG    CD     N     gd_zero  ; zero: 3-fold ring torsion strains the 5-ring (pucker set by angles)
 
@@ -931,12 +893,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44S
-   -C     N    CA     C     gd_44Sb
-   -C     N    CA     C     gd_43S
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    OG     gd_34
-    N    CA     C    +N     gd_45S
-    N    CA     C    +N     gd_42S
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
 
 [ THR ]
  [ atoms ]
@@ -980,12 +939,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44T
-   -C     N    CA     C     gd_43T
-   -C     N    CA     C     gd_43Tb
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB   OG1     gd_34
-    N    CA     C    +N     gd_45T
-    N    CA     C    +N     gd_42T
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
 
 [ TRP ]
  [ atoms ]
@@ -1071,12 +1027,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44W
-   -C     N    CA     C     gd_43W
-   -C     N    CA     C     gd_43Wb
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    CG     gd_34
-    N    CA     C    +N     gd_45W
-    N    CA     C    +N     gd_42W
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG   CD2     gd_40
 
 [ TYR ]
@@ -1147,12 +1100,9 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44Y
-   -C     N    CA     C     gd_43Y
-   -C     N    CA     C     gd_43Yb
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB    CG     gd_34
-    N    CA     C    +N     gd_45Y
-    N    CA     C    +N     gd_42Y
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO
    CA    CB    CG   CD1     gd_40
 
 [ VAL ]
@@ -1197,9 +1147,6 @@
  [ dihedrals ]
 ;  ai    aj    ak    al   gromos type
   -CA    -C     N    CA     gd_14
-   -C     N    CA     C     gd_44V
-   -C     N    CA     C     gd_43V
-   -C     N    CA     C     gd_43Vb
+   -C     N    CA     C     gd_cmap  ; backbone phi: coil CMAP written by multi-eGO
     N    CA    CB   CG1     gd_34
-    N    CA     C    +N     gd_45V
-    N    CA     C    +N     gd_42V
+    N    CA     C    +N     gd_cmap  ; backbone psi: coil CMAP written by multi-eGO

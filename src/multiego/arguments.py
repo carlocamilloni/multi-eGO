@@ -55,6 +55,12 @@ _args_dict_shared = {
         "type": str,
         "help": "Configuration file for the system",
     },
+    "--no_coil_cmap": {
+        "default": False,
+        "action": "store_true",
+        "help": "Do not assign the coil CMAP backbone term: keep the backbone dihedrals of the input topology as they "
+        "are (for topologies made with a force field that still defines backbone phi/psi dihedrals).",
+    },
     "--outputs_dir": {
         "default": None,
         "type": str,

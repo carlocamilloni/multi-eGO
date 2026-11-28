@@ -217,6 +217,11 @@ atom_type_combinations = [
     # Tuple of atom type combinations for LJ14 pairs
     ("backbone_nitrogen", "sidechain_cb", None, 5.0e-7, -1),
     ("first_backbone_nitrogen", "backbone_nitrogen", None, 4.0e-6, 1),
+    # softer 1-5 backbone repulsions than the generic nonlocal c12: c12/r^12 = kT(300 K) at the 10th percentile of
+    # the crystal-helix distance. O(i)-C(i+1) 0.288 nm (n->pi* contact, median 0.300; generic O-C c12 2.064e-6 puts
+    # kT at 0.311 nm and stretches N(i+3)..O(i)); C(i)-N(i+2) 0.320 nm (median 0.330; generic N-C c12 3.421e-6)
+    ("backbone_oxygen", "backbone_carbonyl", None, 8.12e-7, 1),
+    ("backbone_carbonyl", "backbone_nitrogen", None, 2.88e-6, 2),
 ]
 
 # Special non-local interactions different from basic mg combination rules
@@ -397,6 +402,21 @@ P_TH_SC_BKBN = 0.010
 P_TH_BKBN = 0.4/2
 # OM atomtype scaling factor. Probability is reduced by a factor to account for the protonation simmetry-breaking that can be found in protein cores 
 OM_SCALEDOWN = 1
+# sigma of attractive pairs: "exp_aver" (rmin = soft-min of the contact histogram, ~5th percentile)
+# or "rrep" (sigma = c12_rep^(1/12) from the repulsive table, rmin at the contact peak)
+ATT_SIGMA = "rrep"
+# separate energy scale of the attractive H-acceptor pairs (H with O, OA, OM, OS); None = part of their class
+EMAX_HB = None
+# per atomtype-pair overrides: PAIR_RMIN {(atp1, atp2): rmin nm} for attractive pairs (instead of ATT_SIGMA),
+# PAIR_EPS {(atp1, atp2): epsilon} (positive = attractive) instead of the probability-derived energy
+# Defaults (27 Nov 2026):
+# - backbone H-bond made mildly directional by splitting it over H-O, N-O and C-H (minima from crystal H-bonds:
+#   H..O 0.20, N..O 0.293 (rrep), C..H 0.31 nm); H-O : N-O : C-H = 2 : 1 : 1, scale (x0.90) tuned to ~20% DSSP helix
+#   of Ac-(AAQAA)3-NH2 at 303 K with the coil CMAP refitted on this prior (refit whenever these values change)
+# - CA-CA minimum 0.47 nm (crystal nonlocal CA-CA peak ~0.465; rrep 0.515 put antiparallel non-H-bonded pairs on the wall)
+# - CA-CB(Val/Ile, CH1b) attractive like CA-CB(Thr) (contact probability 0.009 fell just below P_TH_SC_BKBN)
+PAIR_RMIN = {("H", "O"): 0.20, ("C", "H"): 0.31, ("CAH", "CAH"): 0.47}
+PAIR_EPS = {("H", "O"): 1.8, ("N", "O"): 0.9, ("C", "H"): 0.9, ("CAH", "CH1b"): 0.095}
 
 SHOW = False
 
@@ -407,7 +427,7 @@ PKL = "atdhisto.pkl"
 PKL_SB = "atdhisto.pkl"
 # R2_CORR_SB_= "scbk_correction_3res.csv" # Correction for sc-bkbn interactions # TODO merge the r2 in pkl file or viceversa
 # PKL_SB = None#"atdhisto_sb.pkl" 
-matrix = InteractionMatrix(pkl_file=PKL, emax = EMAX, c12_rep_df = _c12_df, pth=P_TH, pth_bkbn=P_TH_BKBN, show=SHOW, emax_bkbn=EMAX_BKBN, pth_sc_bkbn=P_TH_SC_BKBN, emax_sc_bkbn=EMAX_SC_BKBN, om_scaledown=OM_SCALEDOWN, pkl_file2=PKL_SB)#, r2_corr_sb=R2_CORR_SB_)
+matrix = InteractionMatrix(pkl_file=PKL, emax = EMAX, c12_rep_df = _c12_df, pth=P_TH, pth_bkbn=P_TH_BKBN, show=SHOW, emax_bkbn=EMAX_BKBN, pth_sc_bkbn=P_TH_SC_BKBN, emax_sc_bkbn=EMAX_SC_BKBN, om_scaledown=OM_SCALEDOWN, pkl_file2=PKL_SB, att_sigma=ATT_SIGMA, emax_hb=EMAX_HB, pair_rmin=PAIR_RMIN, pair_eps=PAIR_EPS)#, r2_corr_sb=R2_CORR_SB_)
 special_non_local = matrix.special_nonlocal_dict
 
 # Verify that every attractive special interaction carries an epsilon at least
